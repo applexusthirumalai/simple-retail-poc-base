@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, ModuleWithProviders } from '@angular/core';
-import { LocationStrategy, HashLocationStrategy } from '@angular/common';
+import { LocationStrategy, HashLocationStrategy, CommonModule } from '@angular/common';
 
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
@@ -14,9 +14,10 @@ import { AppComponent } from './app.component';
 
 // Import containers
 import { DefaultLayoutComponent } from './containers';
+import { routes as srRoutes } from './app.routing';
 
-
-const APP_CONTAINERS = [
+export const APP_CONTAINERS = [
+  AppComponent,
   DefaultLayoutComponent
 ];
 
@@ -29,16 +30,21 @@ import {
 } from '@coreui/angular';
 
 // Import routing module
-import { AppRoutingModule } from './app.routing';
+import { AppRoutingModule, routes as appRoutes } from './app.routing';
 
 // Import 3rd party components
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
+import { Router, Routes, RouterModule } from '@angular/router';
+import { Route } from '@angular/compiler/src/core';
+
+
 
 @NgModule({
   imports: [
     BrowserModule,
+    CommonModule,
     AppAsideModule,
     AppBreadcrumbModule.forRoot(),
     AppFooterModule,
@@ -48,10 +54,9 @@ import { ChartsModule } from 'ng2-charts/ng2-charts';
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
     ChartsModule,
-    AppRoutingModule,
+    AppRoutingModule
   ],
   declarations: [
-    AppComponent,
     ...APP_CONTAINERS,
   ],
   providers: [{
@@ -60,10 +65,22 @@ import { ChartsModule } from 'ng2-charts/ng2-charts';
   }],
   exports: [
     AppRoutingModule,
+    APP_CONTAINERS
   ],
-  bootstrap: [ AppComponent ]
+  bootstrap: [AppComponent]
 })
-export class AppModule {
+export class SimpleRetailModule {
+  static forRoot(routes: Routes) {
+    srRoutes[0].children = routes;
+    return {
+      ngModule: SimpleRetailModule,
+      imports: [RouterModule.forRoot(srRoutes)],
+      providers: [{
+        provide: LocationStrategy,
+        useClass: HashLocationStrategy
+      }]
+    };
+  }
 }
 
 
